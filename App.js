@@ -1,117 +1,72 @@
-import React, { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { Pressable, Text, View, TextInput, StyleSheet } from 'react-native';
+import { GluestackUIProvider, Text, Box, Input, FormControl, FormControlLabel, FormControlLabelText, InputField, Button, ButtonText } from '@gluestack-ui/themed';
+import { config } from '@gluestack-ui/config'; // Optional if you want to use default theme
+import React, { useState, useEffect } from 'react';
+import { useCallback } from 'react';
+import styles from './style';
 
 export default function App() {
+  const [valorLitro, setValorLitro] = useState('');
   const [quantidade, setQuantidade] = useState('');
-  const [kmrodado, setKmrodado] = useState('');
+  const [km, setKm] = useState('');
   const [resultado, setResultado] = useState('');
 
-  const valorLitro = 5.52; // Valor fixo em R$5.52
-
-  const calcular = () => {
-    if (quantidade === '' || kmrodado === '') {
-      alert('Por favor, preencha todos os campos.');
-      return;
-    }
-
-    const quant = parseFloat(quantidade);
-    const km = parseFloat(kmrodado);
-
-    if (isNaN(quant) || isNaN(km)) {
-      alert('Valores inválidos. Certifique-se de usar números válidos.');
-      return;
-    }
-
-    const consumo = km / (quant * valorLitro); // Calcula o consumo em km/l
-    setResultado(consumo.toFixed(2));
-  };
-
-  const limpar = () => {
-    setQuantidade('');
-    setKmrodado('');
-    setResultado('');
-  };
-
+  const executar = (valorLitro,quantidade,km) =>{
+    let quantidad = parseInt(quantidade);
+    let valor = parseInt(valorLitro);
+    let quilo = parseInt(km)
+    let dim = (valor * quantidad);
+    let ks = ( dim / quilo);
+    setResultado("R$"+ks.toFixed(2)+"/km");
+  }
+  const limpar = (valorLitro,quantidade,km) =>{
+    setKm("");
+    setQuantidade("");
+    setValorLitro("");
+    setResultado("")
+  }
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <View>
-          <Text style={styles.title}>Valor do litro (R$5.52)</Text>
-        </View>
-        <View>
-          <Text>Quantidade Abastecida</Text>
-          <View style={styles.input}>
-            <TextInput
-              value={quantidade}
-              onChangeText={(text) => setQuantidade(text)}
-              style={styles.texto}
-              keyboardType='numeric'
-            />
-          </View>
-        </View>
-        <View>
-          <Text>Kilômetros Rodados</Text>
-          <View style={styles.input}>
-            <TextInput
-              value={kmrodado}
-              onChangeText={(text) => setKmrodado(text)}
-              style={styles.texto}
-              keyboardType='numeric'
-            />
-          </View>
-        </View>
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <Pressable style={styles.pressable} onPress={calcular}>
-            <Text style={styles.resultado}>Calcular</Text>
-          </Pressable>
-        </View>
-        <View>
-          <Text style={styles.title}>{`Resultado: ${resultado} km/Litro`}</Text>
-        </View>
-        <View>
-          <Pressable style={styles.pressable} onPress={limpar}>
-            <Text style={styles.resultado}>Limpar dados</Text>
-          </Pressable>
-        </View>
-        <StatusBar style="auto" />
-      </View>
-    </View>
+    <GluestackUIProvider config={config}>
+      <Box width="100%" bg='#B19994' justifyContent="center" alignItems="center" h={"$full"}>
+        <FormControl>
+          <Text style={styles.titulo}>Autonomia do Gasto de Combustível</Text>
+          <FormControlLabel pt={30}>
+            <FormControlLabelText>
+              Valor Litro
+            </FormControlLabelText>
+          </FormControlLabel>
+          <Input bg='#D3C0CD' borderColor='#000' borderRadius={15}>
+            <InputField style={styles.textoInput} value={valorLitro} onChangeText={setValorLitro} keyboardType='numeric'/>
+          </Input>
+          <FormControlLabel pt={30}>
+            <FormControlLabelText>
+              Quantidade Abastecida
+            </FormControlLabelText>
+          </FormControlLabel>
+          <Input bg='#D3C0CD' borderColor='#000' borderRadius={15} >
+            <InputField style={styles.textoInput}  value={quantidade} onChangeText={setQuantidade} keyboardType='numeric'/>
+          </Input>
+          <FormControlLabel pt={30}>
+            <FormControlLabelText>
+              Km Rodado
+            </FormControlLabelText>
+          </FormControlLabel>
+          <Input bg='#D3C0CD' borderColor='#000' borderRadius={15}>
+            <InputField style={styles.textoInput} value={km} onChangeText={setKm} keyboardType='numeric'/>
+          </Input>
+          <Box justifyContent="space-around" display="flex" flexDirection="row" pt={30}>
+            <Button bgColor='#937666' onPress={() => executar(valorLitro,quantidade,km)}>
+              <ButtonText>Calcular</ButtonText>
+            </Button>
+            <Button bgColor='#937666' onPress={() => limpar(valorLitro,quantidade,km)}>
+              <ButtonText>Limpar</ButtonText>
+            </Button>
+          </Box>
+          <Box justifyContent="space-around" display="flex" flexDirection="row" pt={30}>
+            <Text style={styles.result}>Resultado:</Text>
+            <Text style={styles.result} fontWeight="$bold">{resultado}</Text>
+          </Box>
+        </FormControl>
+      </Box>
+    </GluestackUIProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    width: '80%',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: 'black',
-    borderRadius: 5,
-    padding: 5,
-    marginTop: 5,
-  },
-  texto: {
-    fontSize: 16,
-  },
-  pressable: {
-    backgroundColor: '#86ee86',
-    borderRadius: 5,
-    padding: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  resultado: {
-    color: 'black',
-  },
-});
